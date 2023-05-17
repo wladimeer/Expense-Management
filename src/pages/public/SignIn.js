@@ -1,26 +1,52 @@
 import React, { useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import Alert from '../../components/Alert';
+import { signIn } from '../../service/user';
 import { Form, FormButtonGroup, Input } from '../../elements/Form';
 import { Headline, HeaderButton, HeaderButtonGroup } from '../../elements/Header';
 import { ReactComponent as LoginImage } from '../../images/login.svg';
 import { Header, HeaderContent } from '../../elements/Header';
+import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
+import useAlert from '../../hooks/useAlert';
 import styled from 'styled-components';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { alert, setAlert } = useAlert();
+  const navigate = useNavigate();
 
   const onChangeInput = ({ target: { name, value } }) => {
     const inputs = {
-      email: { set: (value) => setEmail(value) },
-      password: { set: (value) => setPassword(value) },
+      email: { setValue: (value) => setEmail(value) },
+      password: { setValue: (value) => setPassword(value) }
     }
 
-    inputs[name].set(value);
+    inputs[name].setValue(value);
   }
 
-  const onSubmitForm = (event) => {
+  const onSubmitForm = async (event) => {
     event.preventDefault();
+
+    if ([email, password].includes('')) {
+      setAlert({ visible: true, alertType: 'error', message: 'Check that all fields are completed' });
+
+    } else {
+      const expression = /[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+/;
+
+      if (expression.test(email)) {
+        try {
+          await signIn(email, password);
+          navigate('/');
+          
+        } catch ({ message }) {
+          setAlert({ visible: true, alertType: 'error', message: message });
+        }
+
+      } else {
+        setAlert({ visible: true, alertType: 'error', message: 'Check that the field values are correct' });
+      }
+    }
   }
 
   return (
@@ -48,7 +74,7 @@ const SignIn = () => {
         />
 
         <Input
-          name='primaryPassword' type='password' placeholder='Password'
+          name='password' type='password' placeholder='Password'
           onChange={onChangeInput} value={password}
         />
 
@@ -58,6 +84,8 @@ const SignIn = () => {
           </HeaderButton>
         </FormButtonGroup>
       </Form>
+
+      <Alert { ...alert } setAlert={setAlert} />
     </>
   );
 }

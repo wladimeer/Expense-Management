@@ -2,16 +2,20 @@ import React, { useEffect } from 'react';
 import principalTheme from '../themes/principalTheme.json';
 import styled from 'styled-components';
 
-const Alert = ({ alertType, message, visible, setVisible }) => {
+const Alert = ({ visible, alertType, message, setAlert }) => {
   const verifyAlert = () => {
     let time;
 
-    if (visible) time = setTimeout(() => setVisible(false), 4000);
+    if (visible) {
+      time = setTimeout(() => {
+        setAlert({ visible: false, alertType: null, message: ''});
+      }, 4000);
+    }
 
     return (() => clearTimeout(time));
   }
 
-  useEffect(verifyAlert, [visible, setVisible]);
+  useEffect(verifyAlert, [visible, setAlert]);
 
   return (
     <>

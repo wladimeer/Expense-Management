@@ -1,5 +1,6 @@
+import { firestore, auth, createUserWithEmailAndPassword } from '../firebase';
+import { signInWithEmailAndPassword, onAuthStateChanged, signOut } from '../firebase';
 import { addDoc, getDocs, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { firestore, auth, createUserWithEmailAndPassword, signOut } from '../firebase';
 import { collection, doc, onSnapshot } from 'firebase/firestore';
 
 const usersReference = collection(firestore, 'users');
@@ -16,16 +17,21 @@ const createUser = async (email, password) => {
       photoURL: user.photoURL
     }
 
-    const userReference = await addDoc(usersReference, userData);
-
-    userData.id = userReference.id;
+    await addDoc(usersReference, userData);
 
     const response = { status: 1, message: 'Successfully registered user', data: userData }
   
     return Promise.resolve(response);
 
-  } catch (error) {
-    const response = { status: 0, message: String(error), data: {} }
+  } catch ({ code }) {
+    const message = {
+      'default': 'An error occurred while processing the transaction, please try again',
+      'auth/weak-password': 'Invalid password, must be at least 6 characters',
+      'auth/email-already-in-use': 'Email is already in use for another user',
+      'auth/invalid-email': 'Check email address, it\'s invalid'
+    }
+
+    const response = { status: 0, message: message[code] ?? message['default'], data: {} }
 
     return Promise.reject(response);
   }
@@ -38,7 +44,10 @@ const readUser = async () => {
     const users = docs.map((userDocument) => ({
       id: userDocument.id,
       email: userDocument.get('email'),
-      name: userDocument.get('name')
+      emailVerified: userDocument.get('emailVerified'),
+      phoneNumber: userDocument.get('phoneNumber'),
+      photoURL: userDocument.get('photoURL'),
+      uid: userDocument.get('uid')
     }));
 
     const response = { status: 1, message: 'Successfully obtained users', data: users }
@@ -52,28 +61,28 @@ const readUser = async () => {
   }
 }
 
-const updateUser = async (userId, email = null, name = null) => {
+const updateUser = async (userId, email = null, phoneNumber = null) => {
   try {
     const userReference = doc(firestore, 'users', userId);
     const userDocument = await getDoc(userReference);
-    const user = {}
+    const userData = {}
 
     let message = 'User doesn\'t exist'
 
     if (userDocument.exists()) {
-      if (email !== null) user.email = email;
-      if (name !== null) user.name = name;
+      if (email !== null) userData.email = email;
+      if (phoneNumber !== null) userData.phoneNumber = phoneNumber;
   
-      if (Object.values(user).length > 0) await updateDoc(userReference, user);
+      if (Object.values(userData).length > 0) await updateDoc(userReference, userData);
   
-      user.id = userDocument.id;
-      user.email = userDocument.get('email');
-      user.name = userDocument.get('name');
+      userData.id = userDocument.id;
+      userData.email = userDocument.get('email');
+      userData.phoneNumber = userDocument.get('phoneNumber');
 
       message = 'Successfully updated user'
     }
 
-    const response = { status: 1, message: message, data: user }
+    const response = { status: 1, message: message, data: userData }
 
     return Promise.resolve(response);
 
@@ -156,7 +165,65 @@ const loadUsers = async (usersDocument) => {
   }
 }
 
+const signIn = async (email, password) => {
+  try {
+    const { user } = await signInWithEmailAndPassword(auth, email, password);
+
+    let userData = {
+      uid: user.uid,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      emailVerified: user.emailVerified,
+      photoURL: user.photoURL
+    }
+
+    const response = { status: 1, message: 'Session opened successfully', data: userData }
+
+    return Promise.resolve(response);
+
+  } catch ({ code }) {
+    const message = {
+      'default': 'An error occurred while processing the transaction, please try again',
+      'auth/user-not-found': 'User not found, check the credentials',
+      'auth/wrong-password': 'Check the credentials ingressed'
+    }
+
+    const response = { status: 0, message: message[code] ?? message['default'], data: [] }
+
+    return Promise.reject(response);
+  }
+}
+
+const signOff = async () => {
+  try {
+    const { currentUser } = auth;
+    let userData = {}
+
+    if (currentUser !== null) {
+      userData = {
+        uid: currentUser.uid,
+        email: currentUser.email,
+        phoneNumber: currentUser.phoneNumber,
+        emailVerified: currentUser.emailVerified,
+        photoURL: currentUser.photoURL
+      }
+
+      await signOut(auth);
+    }
+
+    const response = { status: 1, message: 'Session closed successfully', data: userData }
+
+    return Promise.resolve(response);
+
+  } catch (error) {
+    const response = { status: 0, message: String(error), data: [] }
+
+    return Promise.reject(response);
+  }
+}
+
 export {
   createUser, readUser, updateUser, deleteUser, findUser,
-  onSnapshot, loadUsers, signOut, usersReference
+  onSnapshot, loadUsers, signIn, onAuthStateChanged, signOff,
+  usersReference
 };

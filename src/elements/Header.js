@@ -63,12 +63,12 @@ const HeaderButton = styled(Link)(({ primary, withIcon, largeIcon }) => ({
   textDecoration: 'none',
   alignItems: 'center',
   fontSize: '1.25rem',
-  height: '2.75rem',
   cursor: 'pointer',
+  height: '2.75rem',
   fontWeight: 500,
  
   'svg': {
-    height: largeIcon ? '100%' : '0.75rem',
+    height: largeIcon ? '1.25rem' : '0.75rem',
     fill: 'white'
   }
 }));

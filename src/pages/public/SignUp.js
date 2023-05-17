@@ -6,6 +6,7 @@ import { ReactComponent as RegisterImage } from '../../images/register.svg';
 import { Header, HeaderContent } from '../../elements/Header';
 import { createUser } from '../../service/user';
 import { useNavigate } from 'react-router-dom';
+import useAlert from '../../hooks/useAlert';
 import Alert from '../../components/Alert';
 import styled from 'styled-components';
 
@@ -13,13 +14,7 @@ const SignUp = () => {
   const [email, setEmail] = useState('');
   const [primaryPassword, setPrimaryPassword] = useState('');
   const [secundaryPassword, setSecundaryPassword] = useState('');
-  const [visible, setVisible] = useState(false);
-
-  const [alert, setAlert] = useState({
-    alertType: null,
-    message: ''
-  });
-  
+  const { alert, setAlert } = useAlert();
   const navigate = useNavigate();
 
   const onChangeInput = ({ target: { name, value } }) => {
@@ -36,8 +31,7 @@ const SignUp = () => {
     event.preventDefault();
 
     if ([email, primaryPassword, secundaryPassword].includes('')) {
-      setAlert({ alertType: 'error', message: 'Check that all fields are completed' });
-      setVisible(true);
+      setAlert({ visible: true, alertType: 'error', message: 'Check that all fields are completed' });
 
     } else {
       const expression = /[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+/;
@@ -48,9 +42,11 @@ const SignUp = () => {
           navigate('/');
           
         } catch ({ message }) {
-          setAlert({ alertType: 'error', message: message });
-          setVisible(true);
+          setAlert({ visible: true, alertType: 'error', message: message });
         }
+
+      } else {
+        setAlert({ visible: true, alertType: 'error', message: 'Check that the field values are correct' });
       }
     }
   }
@@ -96,7 +92,7 @@ const SignUp = () => {
         </FormButtonGroup>
       </Form>
 
-      <Alert { ...alert } visible={visible} setVisible={setVisible} />
+      <Alert { ...alert } setAlert={setAlert} />
     </>
   );
 }
