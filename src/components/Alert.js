@@ -9,7 +9,7 @@ const Alert = ({ visible, alertType, message, setAlert }) => {
     if (visible) {
       time = setTimeout(() => {
         setAlert({ visible: false, alertType: null, message: ''});
-      }, 4000);
+      }, 1500);
     }
 
     return (() => clearTimeout(time));
@@ -40,7 +40,7 @@ const Container = styled.div(({ alertType }) => ({
   top: '1.25rem',
   display: 'flex',
   position: 'fixed',
-  animation: `slideDown 4s ease forwards`,
+  animation: `slideDown 2s ease forwards`,
   justifyContent: 'center',
   alignItems: 'center',
   width: '100%',

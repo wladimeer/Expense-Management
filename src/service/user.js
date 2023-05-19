@@ -9,7 +9,7 @@ const createUser = async (email, password) => {
   try {
     const { user } = await createUserWithEmailAndPassword(auth, email, password);
     
-    let userData = {
+    const userData = {
       uid: user.uid,
       email: user.email,
       phoneNumber: user.phoneNumber,
@@ -97,21 +97,21 @@ const deleteUser = async (userId) => {
   try {
     const userReference = doc(firestore, 'users', userId);
     const userDocument = await getDoc(userReference);
-    const user = {}
+    const userData = {}
 
     let message = 'User doesn\'t exist'
 
     if (userDocument.exists()) {
       await deleteDoc(userReference);
 
-      user.id = userDocument.id;
-      user.email = userDocument.get('email');
-      user.name = userDocument.get('name');
+      userData.id = userDocument.id;
+      userData.email = userDocument.get('email');
+      userData.name = userDocument.get('name');
 
       message = 'Successfully deleted user'
     }
 
-    const response = { status: 1, message: message, data: user }
+    const response = { status: 1, message: message, data: userData }
 
     return Promise.resolve(response);
 
@@ -127,13 +127,13 @@ const findUser = async (userId) => {
     const userReference = doc(firestore, 'users', userId);
     const userDocument = await getDoc(userReference);
 
-    const user = {
+    const userData = {
       id: userDocument.id,
       email: userDocument.get('email'),
       name: userDocument.get('name')
     }
 
-    const response = { status: 1, message: 'Successfully obtained user', data: user }
+    const response = { status: 1, message: 'Successfully obtained user', data: userData }
 
     return Promise.resolve(response);
     
@@ -169,7 +169,7 @@ const signIn = async (email, password) => {
   try {
     const { user } = await signInWithEmailAndPassword(auth, email, password);
 
-    let userData = {
+    const userData = {
       uid: user.uid,
       email: user.email,
       phoneNumber: user.phoneNumber,
@@ -197,16 +197,14 @@ const signIn = async (email, password) => {
 const signOff = async () => {
   try {
     const { currentUser } = auth;
-    let userData = {}
+    const userData = {}
 
     if (currentUser !== null) {
-      userData = {
-        uid: currentUser.uid,
-        email: currentUser.email,
-        phoneNumber: currentUser.phoneNumber,
-        emailVerified: currentUser.emailVerified,
-        photoURL: currentUser.photoURL
-      }
+      userData.uid = currentUser.uid;
+      userData.email = currentUser.email;
+      userData.phoneNumber = currentUser.phoneNumber;
+      userData.emailVerified = currentUser.emailVerified;
+      userData.photoURL = currentUser.photoURL;
 
       await signOut(auth);
     }

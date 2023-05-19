@@ -1,5 +1,5 @@
+import React, { useState } from 'react';
 import { DayPicker } from 'react-day-picker';
-import React, { useEffect, useState } from 'react';
 import principalTheme from '../themes/principalTheme.json';
 import 'react-day-picker/dist/style.css';
 import styled from 'styled-components';
@@ -7,22 +7,16 @@ import { format } from 'date-fns';
 
 const DatePicker = ({ selected, setSelected }) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [textDate, setTextDate] = useState('');
 
   const onSelectDay = (date = new Date()) => {
-    const newDate = format(date, `MMMM dd 'Of' Y`);
-
     setIsVisible(false);
-    setTextDate(newDate);
     setSelected(date);
   }
-
-  useEffect(onSelectDay, []);
 
   return (
     <Container>
       <input
-        readOnly type='text' value={textDate}
+        readOnly type='text' value={format(selected, `MMMM dd 'Of' Y`)}
         onClick={() => setIsVisible(!isVisible)}
       />
 
