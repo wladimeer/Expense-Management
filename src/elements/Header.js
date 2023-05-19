@@ -56,7 +56,7 @@ const HeaderButton = styled(Link)(({ primary, withIcon, largeIcon }) => ({
   display: 'inline-flex',
   borderRadius: '0.625rem',
   padding: '1.25rem 1.87rem',
-  width: withIcon ? '15.62rem' : 'auto',
+  width: withIcon ? '13.62rem' : 'auto',
   background: primary ? '#5B69E2' : '#000000',
   fontFamily: 'Work Sans, sans-serif',
   justifyContent: 'space-between',

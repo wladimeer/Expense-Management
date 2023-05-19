@@ -1,4 +1,5 @@
 import React from 'react';
+import ExpenseForm from '../../components/ExpenseForm';
 import { HeaderButton, Headline } from '../../elements/Header';
 import { Header, HeaderContent, HeaderButtonGroup } from '../../elements/Header';
 import ExitButton from '../../components/ExitButton';
@@ -23,7 +24,7 @@ const NewExpense = () => {
         </HeaderContent>
       </Header>
 
-      AddExpense
+      <ExpenseForm />
     </>
   );
 }
