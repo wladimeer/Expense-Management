@@ -35,12 +35,14 @@ const ExpenseList = () => {
   }
 
   const loadMoreData = () => {
-    if (!isLastExpense.current) loadExpenseList();
+    if (!isLastExpense) loadExpenseList();
   }
 
   const deleteData = async (expenseId) => {
     try {
       await deleteExpense(expenseId);
+
+      loadExpenseList(true);
 
     } catch ({ message }) {
       console.error(message);
