@@ -5,10 +5,19 @@ import { onSnapshot, startAfter } from 'firebase/firestore';
 import useAuth from '../hooks/useAuth';
 
 const useGetExpense = () => {
+  const lastExpense = useRef({});
+  const isLastExpense = useRef(false);
+  const subscriptions = useRef([]);
+
   const [loading, setLoading] = useState(true);
   const [expenses, setExpenses] = useState([]);
-  const lastExpense = useRef({});
   const { user } = useAuth();
+
+  const subscriptionCleanup = () => {
+    const { current } = subscriptions;
+
+    current.forEach((subscription) => subscription());
+  }
 
   const showData = async (snapshot) => {
     try {
@@ -17,6 +26,9 @@ const useGetExpense = () => {
       if (data.length > 0) {
         setExpenses([...expenses, ...data]);
         lastExpense.current = lastDocument;
+
+      } else {
+        isLastExpense.current = true;
       }
 
       if (loading) setLoading(false);
@@ -30,7 +42,7 @@ const useGetExpense = () => {
     console.error(error);
   }
 
-  useEffect(() => {
+  const loadExpenseList = () => {
     const expensesQuery = query(
       expensesReference,
       where('userUid', '==', user.uid),
@@ -39,15 +51,21 @@ const useGetExpense = () => {
       limit(1)
     );
 
-    const unsuscribeReference = onSnapshot(
+    const subscription = onSnapshot(
       expensesQuery, showData, showError
     );
 
-    return unsuscribeReference;
+    subscriptions.current = [...subscriptions.current, subscription];
+  };
+
+  useEffect(() => {
+    loadExpenseList();
+
+    return subscriptionCleanup;
 
   }, [user]);
 
-  return { expenses, loading, user, lastExpense, showData, showError };
+  return { expenses, loading, isLastExpense, loadExpenseList };
 }
  
 export default useGetExpense;

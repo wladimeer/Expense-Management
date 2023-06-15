@@ -1,5 +1,5 @@
+import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import React, { useEffect, useRef } from 'react';
 import BackButton from '../../components/BackButton';
 import HTMLRendered from '../../components/HTMLRendered';
 import TotalExpenseBar from '../../components/TotalExpenseBar';
@@ -18,13 +18,8 @@ import { HeaderButton } from '../../elements/Header';
 import { fromUnixTime, format } from 'date-fns';
 import { Link } from 'react-router-dom';
 
-import { expensesReference } from '../../service/expense';
-import { query, limit, orderBy, where } from 'firebase/firestore';
-import { onSnapshot, startAfter } from 'firebase/firestore';
-
 const ExpenseList = () => {
-  const { expenses, loading, user, lastExpense, showData, showError } = useGetExpense();
-  const subscriptions = useRef([])
+  const { expenses, loading, isLastExpense, loadExpenseList } = useGetExpense();
 
   const getDateFromUnixTime = (date) => {
     const newDate = fromUnixTime(date);
@@ -39,29 +34,11 @@ const ExpenseList = () => {
     return firstDate === secondDate;
   }
 
-  const subscriptionCleanup = () => {
-    const { current } = subscriptions;
-    
-    current.forEach((subscription) => subscription());
+  const loadMoreData = () => {
+    if (!isLastExpense.current) loadExpenseList();
   }
 
-  const loadMoreData = async () => {
-    const expensesQuery = query(
-      expensesReference,
-      where('userUid', '==', user.uid),
-      orderBy('date', 'desc'),
-      startAfter(lastExpense.current),
-      limit(1)
-    );
-
-    const subscription = onSnapshot(
-      expensesQuery, showData, showError
-    );
-
-    subscriptions.current = [...subscriptions.current, subscription];
-  };
-
-  const removeExpense = async (expenseId) => {
+  const deleteData = async (expenseId) => {
     try {
       await deleteExpense(expenseId);
 
@@ -69,8 +46,6 @@ const ExpenseList = () => {
       console.error(message);
     }
   }
-
-  useEffect(() => subscriptionCleanup, [user]);
 
   return (
     <>
@@ -111,7 +86,7 @@ const ExpenseList = () => {
                         <Edit />
                       </ButtonAction>
 
-                      <ButtonAction onClick={() => removeExpense(expense.id)}>
+                      <ButtonAction onClick={() => deleteData(expense.id)}>
                         <Delete />
                       </ButtonAction>
                     </ButtonContainer>
