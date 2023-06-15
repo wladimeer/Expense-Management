@@ -72,6 +72,7 @@ const ExpenseForm = () => {
             currentOption={currentOption}
             setCurrentOption={setCurrentOption}
           />
+          
           <DatePicker 
             selected={selected}
             setSelected={setSelected}

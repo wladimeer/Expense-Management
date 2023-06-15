@@ -2,6 +2,7 @@ import React from 'react';
 import ExpenseForm from '../../components/ExpenseForm';
 import { HeaderButton, Headline } from '../../elements/Header';
 import { Header, HeaderContent, HeaderButtonGroup } from '../../elements/Header';
+import TotalExpenseBar from '../../components/TotalExpenseBar';
 import ExitButton from '../../components/ExitButton';
 import { Helmet } from 'react-helmet-async';
 
@@ -25,6 +26,7 @@ const NewExpense = () => {
       </Header>
 
       <ExpenseForm />
+      <TotalExpenseBar />
     </>
   );
 }

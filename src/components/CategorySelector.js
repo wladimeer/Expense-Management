@@ -9,6 +9,7 @@ import { ReactComponent as Transport } from '../images/cat_transport.svg';
 import { ReactComponent as Shopping } from '../images/cat_shopping.svg';
 import { ReactComponent as Home } from '../images/cat_home.svg';
 import principalTheme from '../themes/principalTheme.json';
+import { renderToStaticMarkup } from 'react-dom/server';
 import styled from 'styled-components';
 
 const CategorySelector = ({ currentOption, setCurrentOption }) => {
@@ -26,9 +27,10 @@ const CategorySelector = ({ currentOption, setCurrentOption }) => {
   ]
 
   const onClickOption = ({ target: { dataset: { id } } }) => {
-    const { value } = categories.find((c) => c.id === Number(id));
+    const { value, icon } = categories.find((c) => c.id === Number(id));
+    const newIcon = String(renderToStaticMarkup(icon));
 
-    setCurrentOption({ id, value });
+    setCurrentOption({ id, value, icon: newIcon });
     setIsVisible(false);
   }
 

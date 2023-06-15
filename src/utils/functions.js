@@ -8,4 +8,10 @@ const toTitle = (text) => {
   return newText.join(' ');
 }
 
-export { toTitle };
+const toChileanPesos = (value) => {
+  const locales = { style: 'currency', currency: 'CLP', minumunFractionDigits: 3 }
+
+  return new Intl.NumberFormat('en-US', locales).format(value);
+}
+
+export { toTitle, toChileanPesos };
