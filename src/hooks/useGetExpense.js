@@ -25,39 +25,40 @@ const useGetExpense = () => {
       const docChanges = snapshot.docChanges();
 
       docChanges.forEach(({ doc, type }) => {
-        const expense = {
-          id: doc.id,
-          description: doc.get('description'),
-          category: JSON.parse(doc.get('category')),
-          quantity: doc.get('quantity'),
-          userUid: doc.get('userUid'),
-          date: doc.get('date')
-        };
-  
         if (type === 'added') {
-          const exist = expenseListRef.current.find((e) => e.id === expense.id);
-          if (!exist) expenseListRef.current.push(expense);
+          const exist = expenseListRef.current.find((e) => e.id === doc.id);
+          if (!exist) expenseListRef.current.push(doc);
         }
   
         if (type === 'modified') {
-          const index = expenseListRef.current.findIndex((e) => e.id === expense.id);
-          expenseListRef.current.splice(index, 1, expense);
+          const index = expenseListRef.current.findIndex((e) => e.id === doc.id);
+          if (index !== -1) expenseListRef.current.splice(index, 1, doc);
         }
   
         if (type === 'removed') {
-          const index = expenseListRef.current.findIndex((e) => e.id === expense.id);
-          expenseListRef.current.splice(index, 1);
+          const index = expenseListRef.current.findIndex((e) => e.id === doc.id);
+          if (index !== -1) expenseListRef.current.splice(index, 1);
         }
       });
 
-      setExpenses([...expenseListRef.current]);
+      const arrayRef = [...expenseListRef.current].map((doc) => ({
+        ...doc.data(),
+        id: doc.id, category: JSON.parse(doc.get('category'))
+      }));
 
-      if (docChanges.length > 0) {
-        const { doc } = [...docChanges].pop();
+      setExpenses(arrayRef);
+
+      if (expenseListRef.current.length > 0) {
+        const doc = [...expenseListRef.current].pop();
         lastExpense.current = doc;
+
+      } else {
+        lastExpense.current = {};
       }
 
-      if (loading) setLoading(false);
+      if (docChanges.length === 0) isLastExpense.current = true;
+
+      setLoading(false);
 
     } catch ({ message }) {
       console.error(message);

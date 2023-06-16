@@ -42,8 +42,6 @@ const ExpenseList = () => {
     try {
       await deleteExpense(expenseId);
 
-      loadExpenseList(true);
-
     } catch ({ message }) {
       console.error(message);
     }
