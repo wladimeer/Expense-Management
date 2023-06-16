@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { query, limit, orderBy, where } from 'firebase/firestore';
 import { onSnapshot, startAfter } from 'firebase/firestore';
 import { expensesReference } from '../service/expense';
@@ -69,13 +69,13 @@ const useGetExpense = () => {
     console.error(error);
   }
 
-  const loadExpenseList = () => {
+  const loadExpenseList = useCallback(() => {
     const expensesQuery = query(
       expensesReference,
       where('userUid', '==', user.uid),
       orderBy('date', 'desc'),
       startAfter(lastExpense.current),
-      limit(1)
+      limit(5)
     );
 
     const subscription = onSnapshot(
@@ -85,14 +85,14 @@ const useGetExpense = () => {
     const { current } = subscriptions;
 
     subscriptions.current = [...current, subscription];
-  };
+  }, [user]);
 
   useEffect(() => {
     loadExpenseList();
 
     return subscriptionCleanup;
 
-  }, [user]);
+  }, [user, loadExpenseList]);
 
   return {
     expenses, loading, isLastExpense: isLastExpense.current,

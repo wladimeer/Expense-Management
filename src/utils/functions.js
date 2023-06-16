@@ -1,3 +1,5 @@
+import { fromUnixTime, format } from 'date-fns';
+
 const toTitle = (text) => {
   const words = text.toLowerCase().split(' ');
 
@@ -14,4 +16,24 @@ const toChileanPesos = (value) => {
   return new Intl.NumberFormat('en-US', locales).format(value);
 }
 
-export { toTitle, toChileanPesos };
+const getDateFromUnixTime = (date) => {
+  const newDate = fromUnixTime(date);
+
+  return format(newDate, `MMMM dd Y`);
+}
+
+const getFormatDateFromUnixTime = (date) => {
+  return fromUnixTime(date);
+}
+
+const compareUnixTimes = (firstUnixTime, secondUnixTime) => {
+  const firstDate = fromUnixTime(firstUnixTime).getDate();
+  const secondDate = fromUnixTime(secondUnixTime).getDate();
+
+  return firstDate === secondDate;
+}
+
+export {
+  toTitle, toChileanPesos, getDateFromUnixTime, compareUnixTimes,
+  getFormatDateFromUnixTime
+}

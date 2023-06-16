@@ -2,10 +2,11 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 import BackButton from '../../components/BackButton';
 import HTMLRendered from '../../components/HTMLRendered';
+import { ContainerList, ListItem } from '../../elements/List';
 import TotalExpenseBar from '../../components/TotalExpenseBar';
-import { ContainerList, ListItem, CategoryList } from '../../elements/List';
-import { CategoryListItem, ButtonContainer, ButtonAction } from '../../elements/List';
+import { ButtonContainer, ButtonAction } from '../../elements/List';
 import { LoadMoreButton, CentralButtonContainer } from '../../elements/List';
+import { getDateFromUnixTime, compareUnixTimes } from '../../utils/functions';
 import { Category, Description, Value, Date } from '../../elements/List';
 import { ReactComponent as Delete } from '../../images/delete.svg';
 import { SubtitleContainer, Subtitle } from '../../elements/List';
@@ -15,24 +16,10 @@ import { toChileanPesos } from '../../utils/functions';
 import { deleteExpense } from '../../service/expense';
 import useGetExpense from '../../hooks/useGetExpense';
 import { HeaderButton } from '../../elements/Header';
-import { fromUnixTime, format } from 'date-fns';
 import { Link } from 'react-router-dom';
 
 const ExpenseList = () => {
   const { expenses, loading, isLastExpense, loadExpenseList } = useGetExpense();
-
-  const getDateFromUnixTime = (date) => {
-    const newDate = fromUnixTime(date);
-
-    return format(newDate, `MMMM dd Y`);
-  }
-
-  const compareUnixTimes = (firstUnixTime, secondUnixTime) => {
-    const firstDate = fromUnixTime(firstUnixTime).getDate();
-    const secondDate = fromUnixTime(secondUnixTime).getDate();
-
-    return firstDate === secondDate;
-  }
 
   const loadMoreData = () => {
     if (!isLastExpense) loadExpenseList();
@@ -82,7 +69,7 @@ const ExpenseList = () => {
                     <Value>{toChileanPesos(expense.quantity)}</Value>
 
                     <ButtonContainer>
-                      <ButtonAction as={Link} to={`/expense/modify/:${expense.id}`}>
+                      <ButtonAction as={Link} to={`/expense/modify/${expense.id}`}>
                         <Edit />
                       </ButtonAction>
 

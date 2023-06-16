@@ -47,13 +47,53 @@ const readExpense = async () => {
   }
 }
 
+const updateExpense = async ({ id, description = null, quantity = null, category = null, date = null }) => {
+  try {
+    const expenseReference = doc(firestore, 'expenses', id);
+    const expenseDocument = await getDoc(expenseReference);
+    const expenseData = {}
+
+    let message = 'Expense doesn\'t exist'
+    let status = 2;
+
+    if (expenseDocument.exists()) {
+      if (description !== null) expenseData.description = description;
+      if (quantity !== null) expenseData.quantity = quantity;
+      if (category !== null) expenseData.category = category;
+      if (date !== null) expenseData.date = date;
+  
+      if (Object.values(expenseData).length > 0) await updateDoc(expenseReference, expenseData);
+  
+      expenseData.id = expenseDocument.id;
+      expenseData.description = description ?? expenseDocument.get('description');
+      expenseData.category = JSON.parse(category ?? expenseDocument.get('category'));
+      expenseData.quantity = quantity ?? expenseDocument.get('quantity');
+      expenseData.date = date ?? expenseDocument.get('date');
+      expenseData.userUid = expenseDocument.get('userUid');
+
+      message = 'Successfully updated expense'
+      status = 1;
+    }
+
+    const response = { status, message, data: expenseData }
+
+    return Promise.resolve(response);
+
+  } catch (error) {
+    const response = { status: 0, message: String(error), data: {} }
+
+    return Promise.reject(response);
+  }
+}
+
 const deleteExpense = async (expenseId) => {
   try {
     const expenseReference = doc(firestore, 'expenses', expenseId);
     const expenseDocument = await getDoc(expenseReference);
     const expenseData = {}
 
-    let message = 'Expense doesn\'t exist'
+    let message = 'Expense doesn\'t exist';
+    let status = 2;
 
     if (expenseDocument.exists()) {
       await deleteDoc(expenseReference);
@@ -65,10 +105,11 @@ const deleteExpense = async (expenseId) => {
       expenseData.userUid = expenseDocument.get('userUid');
       expenseData.date = expenseDocument.get('date');
 
-      message = 'Successfully deleted expense'
+      message = 'Successfully deleted expense';
+      status = 1;
     }
 
-    const response = { status: 1, message: message, data: expenseData }
+    const response = { status, message, data: expenseData }
 
     return Promise.resolve(response);
 
@@ -79,34 +120,39 @@ const deleteExpense = async (expenseId) => {
   }
 }
 
-const loadExpenses = async (expensesDocument) => {
+const findExpense = async (expenseId) => {
   try {
-    const { docs } = expensesDocument;
-    let lastDocument = {};
+    const expenseReference = doc(firestore, 'expenses', expenseId);
+    const expenseDocument = await getDoc(expenseReference);
+    const expenseData = {}
 
-    const expenses = docs.map((expenseDocument) => ({
-      id: expenseDocument.id,
-      description: expenseDocument.get('description'),
-      category: JSON.parse(expenseDocument.get('category')),
-      quantity: expenseDocument.get('quantity'),
-      userUid: expenseDocument.get('userUid'),
-      date: expenseDocument.get('date')
-    }));
+    let message = 'Expense doesn\'t exist';
+    let status = 2;
 
-    if (docs.length > 0) lastDocument = [...docs].pop();
+    if (expenseDocument.exists()) {
+      expenseData.id = expenseDocument.id;
+      expenseData.description = expenseDocument.get('description');
+      expenseData.category = JSON.parse(expenseDocument.get('category'));
+      expenseData.quantity = expenseDocument.get('quantity');
+      expenseData.userUid = expenseDocument.get('userUid');
+      expenseData.date = expenseDocument.get('date');
 
-    const response = { status: 1, message: 'Successfully obtained expenses', data: expenses, lastDocument }
+      message = 'Successfully obtained expense';
+      status = 1;
+    }
+
+    const response = { status, message, data: expenseData }
 
     return Promise.resolve(response);
-
+    
   } catch (error) {
-    const response = { status: 0, message: String(error), data: [] }
+    const response = { status: 0, message: String(error), data: {} }
 
     return Promise.reject(response);
   }
 }
 
 export {
-  createExpense, readExpense, deleteExpense, loadExpenses,
+  createExpense, readExpense, updateExpense, deleteExpense, findExpense,
   expensesReference
 };
