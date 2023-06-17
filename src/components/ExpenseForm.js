@@ -7,10 +7,10 @@ import { createExpense, updateExpense } from '../service/expense';
 import { SubtitleContainer, Subtitle } from '../elements/List';
 import { Input, LargeInput } from '../elements/Form';
 import { HeaderButton } from '../elements/Header';
-import getUnixTime from 'date-fns/getUnixTime';
 import { toTitle } from '../utils/functions';
 import { useNavigate } from 'react-router';
 import Alert from '../components/Alert';
+import { getUnixTime } from 'date-fns';
 import DatePicker from './DatePicker';
 
 const ExpenseForm = ({ formType = 'create', expense = {} }) => {

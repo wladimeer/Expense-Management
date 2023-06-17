@@ -1,13 +1,16 @@
 import React from 'react';
 import principalTheme from '../themes/principalTheme.json';
+import useTotalMonthExpense from '../hooks/useTotalMonthExpense';
 import { toChileanPesos } from '../utils/functions';
 import styled from 'styled-components';
 
 const TotalExpenseBar = () => {
+  const { totalCost } = useTotalMonthExpense();
+
   return (
     <Container>
       <p>Month Total Expense:</p>
-      <p>{toChileanPesos(0)}</p>
+      <p>{toChileanPesos(totalCost)}</p>
     </Container>
   );
 }

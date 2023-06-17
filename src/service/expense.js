@@ -152,7 +152,31 @@ const findExpense = async (expenseId) => {
   }
 }
 
+const getExpenses = async (expensesDocument) => {
+  try {
+    const { docs } = expensesDocument;
+
+    const expenses = docs.map((expenseDocument) => ({
+      id: expenseDocument.id,
+      description: expenseDocument.get('description'),
+      category: JSON.parse(expenseDocument.get('category')),
+      quantity: expenseDocument.get('quantity'),
+      userUid: expenseDocument.get('userUid'),
+      date: expenseDocument.get('date')
+    }));
+
+    const response = { status: 1, message: 'Successfully obtained expenses', data: expenses }
+
+    return Promise.resolve(response);
+
+  } catch (error) {
+    const response = { status: 0, message: String(error), data: [] }
+
+    return Promise.reject(response);
+  }
+}
+
 export {
-  createExpense, readExpense, updateExpense, deleteExpense, findExpense,
-  expensesReference
+  createExpense, readExpense, updateExpense, deleteExpense,
+  findExpense, getExpenses, expensesReference
 };

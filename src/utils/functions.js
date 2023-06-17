@@ -36,4 +36,4 @@ const compareUnixTimes = (firstUnixTime, secondUnixTime) => {
 export {
   toTitle, toChileanPesos, getDateFromUnixTime, compareUnixTimes,
   getFormatDateFromUnixTime
-}
+};
