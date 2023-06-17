@@ -26,6 +26,7 @@ const NewExpense = () => {
       </Header>
 
       <ExpenseForm />
+      
       <TotalExpenseBar />
     </>
   );

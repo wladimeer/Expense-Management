@@ -2,9 +2,9 @@ import { TotalMonthExpenseContext } from '../contexts/TotalMonthExpenseContext';
 import { useContext } from 'react';
 
 const useTotalMonthExpense = () => {
-  const { expenses, totalCost, loading } = useContext(TotalMonthExpenseContext);
+  const { expenses, totalCost } = useContext(TotalMonthExpenseContext);
 
-  return { expenses, totalCost, loading };
+  return { expenses, totalCost };
 }
 
 export default useTotalMonthExpense;

@@ -95,6 +95,7 @@ const ExpenseList = () => {
           )          
         )}
       </ContainerList>
+      
       <TotalExpenseBar />
     </>
   );

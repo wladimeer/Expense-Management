@@ -23,6 +23,7 @@ const NewExpense = () => {
       </Header>
 
       <ExpenseForm formType='update' expense={expense} />
+      
       <TotalExpenseBar />
     </>
   );

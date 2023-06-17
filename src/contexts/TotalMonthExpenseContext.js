@@ -4,11 +4,11 @@ import useGetMonthExpense from "../hooks/useGetMonthExpense";
 const TotalMonthExpenseContext = createContext();
 
 const TotalMonthExpenseProvider = ({ children }) => {
-  const { expenses, totalCost, loading } = useGetMonthExpense();
+  const { expenses, totalCost } = useGetMonthExpense();
 
   return (
-    <TotalMonthExpenseContext.Provider value={{ expenses, totalCost, loading }}>
-      {!loading && children}
+    <TotalMonthExpenseContext.Provider value={{ expenses, totalCost }}>
+      {children}
     </TotalMonthExpenseContext.Provider>
   );
 }
